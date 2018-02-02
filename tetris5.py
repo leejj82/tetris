@@ -220,6 +220,15 @@ def input_treatment(event,done, dead,tetris_piece,x_coord, y_coord, y_coord_for_
     return done , dead, tetris_piece,y_coord,x_speed, y_speed
 
 
+def update_x_and_y_coordinates_after_checking_collision(tetris_piece,x_coord, y_coord, y_coord_for_showing, x_speed, y_speed, bottom_blocks):
+    x_coord = x_coord + x_speed
+    while tetris_piece.collision_R(x_coord, y_coord_for_showing, bottom_blocks) and x_speed == 1:
+        x_coord = x_coord - 1
+    while tetris_piece.collision_L(x_coord, y_coord_for_showing, bottom_blocks) and x_speed == -1:
+        x_coord = x_coord + 1
+    y_coord = y_coord + y_speed
+    y_coord_for_showing = int(y_coord // 1)
+    return x_coord, y_coord, y_coord_for_showing
 
 def main():
 
@@ -256,23 +265,14 @@ def main():
                         for event in pygame.event.get():  # User did something
                             done, dead, tetris_piece, y_coord, x_speed, y_speed=input_treatment(event,done, dead,tetris_piece,x_coord, y_coord, y_coord_for_showing,  x_speed, y_speed, bottom_blocks)
 
-                        x_coord = x_coord + x_speed
-                        while tetris_piece.collision_R(x_coord, y_coord_for_showing, bottom_blocks) and  x_speed==1:
-                            x_coord = x_coord-1
-                        while tetris_piece.collision_L(x_coord, y_coord_for_showing, bottom_blocks) and x_speed==-1:
-                            x_coord = x_coord+1
-                        y_coord = y_coord + y_speed
-                        y_coord_for_showing=int(y_coord//1)
+                        x_coord, y_coord, y_coord_for_showing= update_x_and_y_coordinates_after_checking_collision(tetris_piece,x_coord,y_coord,y_coord_for_showing,x_speed,y_speed,bottom_blocks)
 
                         if tetris_piece.collision_bottom_stack(x_coord, y_coord_for_showing, bottom_blocks):
-
                             if y_coord_for_showing!=0:
-
                                 tetris_piece = tetris_piece.position(x_coord, y_coord_for_showing-1)
                                 bottom_blocks.insert(tetris_piece)
                                 tetris_lookahead, tetris_piece, tetris_future = setup_drops(tetris_lookahead)
                                 x_coord, y_coord, y_coord_for_showing = set_to_the_beginning()
-
                             else:
                                 dead=True
 
