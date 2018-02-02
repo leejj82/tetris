@@ -240,7 +240,7 @@ def main():
                             if index==0:
                                 bottom_blocks.kill(i)
                                 count+=1
-                                if count%2==0:
+                                if count%3==0:
                                     y_speed += 0.1
 
                         font = pygame.font.SysFont('Calibri', blocksize, True, False)
