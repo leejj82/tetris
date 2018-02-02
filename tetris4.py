@@ -8,7 +8,7 @@ BLUE     = (   0,   0, 255)
 GREEN    = (   0, 255,   0)
 RED      = ( 255,   0,   0)
 
-blocksize=25
+blocksize=30
 dimension=[20,10]
 size = [blocksize*(dimension[1]+7), blocksize*(dimension[0]+1)]
 
@@ -92,6 +92,14 @@ class tetris:
             temp=[x * blocksize for x in temp]
             pygame.draw.rect(screen, color, temp)
 
+    def future_draw(self,screen,color,coordinates):
+        for i in range(4):
+            temp=[self.shape[i][0]+coordinates[0],self.shape[i][1]+coordinates[1]]
+            temp=temp+[1,1]
+            temp=[x * blocksize for x in temp]
+            pygame.draw.rect(screen, color, temp)
+
+
     def collision_R(self,x,y,bottom_stack):
         temp=self.position(x,y)
         index=0
@@ -169,7 +177,14 @@ def main():
                     x_coord = int(dimension[1] // 2)
                     y_coord = 0
                     y_coord_for_showing = 0
-                    tetris_piece = tetris(list_of_tetris[random.randrange(0, different_shapes)])
+
+                    tetris_lookahead=[]
+                    for i in range(2):
+                        tetris_lookahead.append(random.randrange(0, different_shapes))
+
+                    tetris_piece = tetris(list_of_tetris[tetris_lookahead[0]])
+                    tetris_lookahead.pop(0)
+                    tetris_future= tetris(list_of_tetris[tetris_lookahead[0]])
 
                     bottom_blocks = bottom()
                     count = 0
@@ -219,7 +234,12 @@ def main():
                                 tetris_piece = tetris_piece.position(x_coord, y_coord_for_showing-1)
                                 bottom_blocks.insert(tetris_piece)
 
-                                tetris_piece = tetris(list_of_tetris[random.randrange(0, different_shapes)])
+                                tetris_piece = tetris(list_of_tetris[tetris_lookahead[0]])
+                                tetris_lookahead.pop(0)
+                                tetris_lookahead.append(random.randrange(0, different_shapes))
+                                tetris_future = tetris(list_of_tetris[tetris_lookahead[0]])
+
+
                                 x_coord = int(dimension[1]//2)
                                 y_coord = 0
                                 y_coord_for_showing = 0
@@ -243,18 +263,21 @@ def main():
                                 if count%3==0:
                                     y_speed += 0.1
 
+                        bottom_blocks.draw(screen, GREEN)
+                        tetris_future.future_draw(screen, BLUE, [dimension[1]+3, 13])
+
                         font = pygame.font.SysFont('Calibri', blocksize, True, False)
 
                         text1 = font.render("SCORE", True, BLACK)
                         text2=  font.render( str(count), True, BLACK)
                         text3 = font.render("LEVEL", True, BLACK)
                         text4=  font.render( str(count//2), True, BLACK)
-                        screen.blit(text1, [int(300*(blocksize/25)), int(50*(blocksize/25))])
-                        screen.blit(text2, [int(355*(blocksize/25)), int(100*(blocksize/25))])
-                        screen.blit(text3, [int(310*(blocksize/25)), int(150*(blocksize/25))])
-                        screen.blit(text4, [int(355*(blocksize/25)), int(200*(blocksize/25))])
+                        screen.blit(text1, [blocksize*(dimension[1]+1),blocksize*1])
+                        screen.blit(text2, [blocksize*(dimension[1]+1),blocksize*4])
+                        screen.blit(text3, [blocksize*(dimension[1]+1), blocksize*7])
+                        screen.blit(text4, [blocksize*(dimension[1]+1), blocksize*10])
 
-                        bottom_blocks.draw(screen, GREEN)
+
 
                         pygame.display.flip()
                         clock.tick(20)
